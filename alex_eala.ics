@@ -1,0 +1,13 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Alex Eala WTA Schedule Feed//EN
+X-WR-CALNAME:Alex Eala - Match Schedule
+X-WR-TIMEZONE:Asia/Manila
+BEGIN:VEVENT
+SUMMARY:[Round of 32] Alex Eala vs TBD
+DTSTART;TZID=Asia/Manila:20260921T140000
+DESCRIPTION:Tournament: Singapore Tennis Open (WTA 500)\nSurface: Indoor H
+ ard Court\nBroadcast: TapGo / SPOTV\nUpdated via custom auto-scraper.
+LOCATION:Singapore Tennis Open (WTA 500)
+END:VEVENT
+END:VCALENDAR
