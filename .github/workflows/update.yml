@@ -3,13 +3,10 @@ name: Sync Alex Eala Calendar
 on:
   schedule:
     - cron: '0 */4 * * *' # Automatically updates every 4 hours
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to manually trigger a sync anytime
 
 permissions:
   contents: write
-
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE20: true
 
 jobs:
   run-sync:
