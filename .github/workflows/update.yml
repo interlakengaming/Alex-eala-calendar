@@ -1,0 +1,36 @@
+name: Auto-Update Alex Eala Calendar Feed
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Runs automatically every 6 hours
+  workflow_dispatch: # Adds a manual trigger button in GitHub UI
+
+permissions:
+  contents: write # Grants GitHub permission to update files in your repository
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests beautifulsoup4 icalendar pytz
+
+      - name: Execute Scraper
+        run: python eala_cal.py
+
+      - name: Commit and Push ICS Updates
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add alex_eala.ics
+          git commit -m "Auto-update Alex Eala match schedule" || exit 0
+          git push
