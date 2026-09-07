@@ -5,7 +5,6 @@ from datetime import datetime
 import pytz
 
 def build_eala_calendar():
-    # 1. Initialize Calendar Meta
     cal = Calendar()
     cal.add('prodid', '-//Alex Eala Match Feed//EN')
     cal.add('version', '2.0')
@@ -14,33 +13,45 @@ def build_eala_calendar():
 
     local_tz = pytz.timezone('Asia/Manila')
 
-    # 2. Fetch schedule data from a public endpoint
-    # Using Sofascore's open endpoint structure for player searches
-    url = "https://api.sofascore.com/api/v1/player/262580/events/next/0"
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    
-    try:
-        with urllib.request.urlopen(req) as response:
-            data = json.loads(response.read().decode())
-            events = data.get('events', [])
-    except Exception as e:
-        print(f"Failed to fetch live API data: {e}")
-        events = []
+    # Fetch both past matches and upcoming matches
+    endpoints = [
+        "https://api.sofascore.com/api/v1/player/262580/events/last/0", # Recent past matches
+        "https://api.sofascore.com/api/v1/player/262580/events/next/0"  # Upcoming matches
+    ]
 
-    # 3. Process matches into iCal format
-    for match in events:
+    all_events = []
+
+    for url in endpoints:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        try:
+            with urllib.request.urlopen(req) as response:
+                data = json.loads(response.read().decode())
+                all_events.extend(data.get('events', []))
+        except Exception as e:
+            print(f"Failed to fetch endpoint {url}: {e}")
+
+    for match in all_events:
         event = Event()
         
         tournament = match.get('tournament', {}).get('name', 'WTA Event')
-        round_info = match.get('roundInfo', {}).get('name', 'Main Draw')
+        round_info = match.get('roundInfo', {}).get('name', 'Match')
         
         home_player = match.get('homeTeam', {}).get('name', '')
         away_player = match.get('awayTeam', {}).get('name', '')
         
-        opponent = away_player if 'Eala' in home_player else home_player
-        title = f"[{round_info}] Alex Eala vs {opponent if opponent else 'TBA'}"
+        is_eala_home = 'Eala' in home_player
+        opponent = away_player if is_eala_home else home_player
+        
+        # Extract score for completed matches
+        status = match.get('status', {}).get('type', '')
+        score_str = ""
+        if status == 'finished':
+            home_score = match.get('homeScore', {}).get('display', '')
+            away_score = match.get('awayScore', {}).get('display', '')
+            score_str = f" [Final: {home_score}-{away_score}]" if home_score != '' else ""
 
-        # Start Time Parsing (UTC Unix Timestamp)
+        title = f"[{round_info}] Alex Eala vs {opponent if opponent else 'TBA'}{score_str}"
+
         timestamp = match.get('startTimestamp')
         if timestamp:
             utc_dt = datetime.fromtimestamp(timestamp, pytz.utc)
@@ -51,6 +62,7 @@ def build_eala_calendar():
         description = (
             f"Tournament: {tournament}\n"
             f"Round: {round_info}\n"
+            f"Status: {status.capitalize()}\n"
             f"Timezone: Manila (UTC+8)\n"
             f"Automated via Sofascore API."
         )
@@ -62,11 +74,10 @@ def build_eala_calendar():
 
         cal.add_component(event)
 
-    # 4. Save output to file
     with open('alex_eala.ics', 'wb') as f:
         f.write(cal.to_ical())
     
-    print("alex_eala.ics synced successfully.")
+    print("alex_eala.ics updated with past and future matches.")
 
 if __name__ == "__main__":
     build_eala_calendar()
