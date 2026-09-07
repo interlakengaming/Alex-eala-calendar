@@ -2,11 +2,14 @@ name: Sync Alex Eala Calendar
 
 on:
   schedule:
-    - cron: '0 */4 * * *' # Auto-check every 4 hours
+    - cron: '0 */4 * * *' # Automatically updates every 4 hours
   workflow_dispatch:
 
 permissions:
   contents: write
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE20: true
 
 jobs:
   run-sync:
