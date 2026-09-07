@@ -11,7 +11,9 @@ def build_eala_calendar():
     cal.add('x-wr-calname', 'Alex Eala Matches')
     cal.add('x-wr-timezone', 'Asia/Manila')
 
-    # Guaranteed baseline matches so the calendar file is NEVER empty
+    local_tz = pytz.timezone('Asia/Manila')
+
+    # Baseline matches guarantee the .ics file is NEVER empty if cloud APIs block requests
     baseline_matches = [
         {
             "tournament": "US Open 2026",
@@ -42,7 +44,7 @@ def build_eala_calendar():
         }
     ]
 
-    # Attempt dynamic API fetch with custom browser headers
+    # Sofascore Player ID for Alex Eala: 327924
     headers = {
         'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
         'Accept': '*/*',
@@ -97,7 +99,7 @@ def build_eala_calendar():
                     "location": tournament
                 })
 
-    # Fallback to baseline matches if API was blocked or empty
+    # Use fetched API matches if available; fallback to baseline matches if blocked
     final_matches = processed_matches if processed_matches else baseline_matches
 
     for item in final_matches:
@@ -106,7 +108,6 @@ def build_eala_calendar():
         
         event.add('summary', title)
         event.add('dtstart', item['start_utc'])
-        # Add 2-hour duration so Google Calendar renders a block instead of an instant point
         event.add('dtend', item['start_utc'] + timedelta(hours=2))
         event.add('description', f"Tournament: {item['tournament']}\nRound: {item['round']}\nStatus: {item['status']}")
         event.add('location', item['location'])
@@ -116,7 +117,7 @@ def build_eala_calendar():
     with open('alex_eala.ics', 'wb') as f:
         f.write(cal.to_ical())
     
-    print(f"alex_eala.ics updated with {len(final_matches)} matches.")
+    print(f"alex_eala.ics updated with {len(final_matches)} match(es).")
 
 if __name__ == "__main__":
     build_eala_calendar()
