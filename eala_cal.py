@@ -13,14 +13,13 @@ def build_eala_calendar():
 
     local_tz = pytz.timezone('Asia/Manila')
 
-    # Fetch both past matches and upcoming matches
+    # Official Sofascore ID for Alex Eala: 327924
     endpoints = [
-        "https://api.sofascore.com/api/v1/player/262580/events/last/0", # Recent past matches
-        "https://api.sofascore.com/api/v1/player/262580/events/next/0"  # Upcoming matches
+        "https://api.sofascore.com/api/v1/player/327924/events/last/0", # Recent past matches
+        "https://api.sofascore.com/api/v1/player/327924/events/next/0"  # Upcoming matches
     ]
 
     all_events = []
-
     for url in endpoints:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         try:
@@ -28,7 +27,7 @@ def build_eala_calendar():
                 data = json.loads(response.read().decode())
                 all_events.extend(data.get('events', []))
         except Exception as e:
-            print(f"Failed to fetch endpoint {url}: {e}")
+            print(f"Error fetching {url}: {e}")
 
     for match in all_events:
         event = Event()
@@ -42,13 +41,29 @@ def build_eala_calendar():
         is_eala_home = 'Eala' in home_player
         opponent = away_player if is_eala_home else home_player
         
-        # Extract score for completed matches
+        # Parse set-by-set breakdown
         status = match.get('status', {}).get('type', '')
         score_str = ""
+        set_details = ""
+        
         if status == 'finished':
-            home_score = match.get('homeScore', {}).get('display', '')
-            away_score = match.get('awayScore', {}).get('display', '')
-            score_str = f" [Final: {home_score}-{away_score}]" if home_score != '' else ""
+            home_score = match.get('homeScore', {})
+            away_score = match.get('awayScore', {})
+            
+            # Extract individual set scores (period1, period2, period3)
+            sets = []
+            for i in range(1, 6):
+                p_key = f'period{i}'
+                if p_key in home_score and p_key in away_score:
+                    sets.append(f"{home_score[p_key]}-{away_score[p_key]}")
+            
+            set_breakdown = ", ".join(sets)
+            h_disp = home_score.get('display', '')
+            a_disp = away_score.get('display', '')
+            
+            if set_breakdown:
+                score_str = f" [Final: {h_disp}-{a_disp} ({set_breakdown})]"
+                set_details = f"Set Breakdown: {set_breakdown}\n"
 
         title = f"[{round_info}] Alex Eala vs {opponent if opponent else 'TBA'}{score_str}"
 
@@ -63,8 +78,8 @@ def build_eala_calendar():
             f"Tournament: {tournament}\n"
             f"Round: {round_info}\n"
             f"Status: {status.capitalize()}\n"
-            f"Timezone: Manila (UTC+8)\n"
-            f"Automated via Sofascore API."
+            f"{set_details}"
+            f"Timezone: Manila (UTC+8)"
         )
 
         event.add('summary', title)
@@ -77,7 +92,7 @@ def build_eala_calendar():
     with open('alex_eala.ics', 'wb') as f:
         f.write(cal.to_ical())
     
-    print("alex_eala.ics updated with past and future matches.")
+    print("alex_eala.ics updated successfully with set scores.")
 
 if __name__ == "__main__":
     build_eala_calendar()
