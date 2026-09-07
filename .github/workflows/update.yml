@@ -3,7 +3,7 @@ name: Sync Alex Eala Calendar
 on:
   schedule:
     - cron: '0 */4 * * *' # Automatically updates every 4 hours
-  workflow_dispatch: # Allows you to manually trigger a sync anytime
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install Dependencies
-        run: pip install icalendar pytz
+        run: pip install icalendar pytz cloudscraper
 
       - name: Run Scraper
         run: python eala_cal.py
