@@ -3,7 +3,7 @@ name: Auto-Update Alex Eala Calendar Feed
 on:
   schedule:
     - cron: '0 */6 * * *' # Runs automatically every 6 hours
-  workflow_dispatch: # Adds a manual trigger button in GitHub UI
+  workflow_dispatch: # Allows manual trigger button in GitHub UI
 
 permissions:
   contents: write # Grants GitHub permission to update files in your repository
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set Up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.10'
 
