@@ -3,4 +3,28 @@ VERSION:2.0
 PRODID:-//Alex Eala Match Feed//EN
 X-WR-CALNAME:Alex Eala Matches
 X-WR-TIMEZONE:Asia/Manila
+BEGIN:VEVENT
+SUMMARY:[Round of 32] Alex Eala vs Iva Jovic [Final: 1-2 (5-7\, 6-3\, 5-7)
+ ]
+DTSTART:20260905T231500Z
+DTEND:20260906T011500Z
+DESCRIPTION:Tournament: US Open 2026\nRound: Round of 32\nStatus: Finished
+LOCATION:USTA Billie Jean King National Tennis Center\, NY
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:[Round of 32] Alex Eala vs TBA
+DTSTART:20260921T060000Z
+DTEND:20260921T080000Z
+DESCRIPTION:Tournament: Singapore Tennis Open (WTA 500)\nRound: Round of 3
+ 2\nStatus: Upcoming
+LOCATION:OCBC Arena\, Singapore
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:[Main Draw] Alex Eala vs TBA
+DTSTART:20260927T020000Z
+DTEND:20260927T040000Z
+DESCRIPTION:Tournament: 2026 Asian Games\nRound: Main Draw\nStatus: Upcomi
+ ng
+LOCATION:Aichi-Nagoya\, Japan
+END:VEVENT
 END:VCALENDAR
